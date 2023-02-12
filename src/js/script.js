@@ -13,6 +13,11 @@ let player;
 
 const cellArray = [];
 let roundCount = 1;
+let columnChosen;
+
+///////////////////////////////////////////////////////////////////////////
+// DOM
+const arrows = document.querySelector(".arrows");
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 class cellCl {
@@ -106,7 +111,7 @@ class graphicRepresentationCl {
     this.lines = lines;
     this.columns = columns;
     this.showInitialBoard();
-    this.updateBoard;
+    this.showArrows();
   }
 
   showInitialBoard() {
@@ -116,6 +121,22 @@ class graphicRepresentationCl {
       board = board + html;
     }
     document.querySelector(".board").innerHTML = board;
+  }
+
+  showArrows() {
+    const arrowBox = document.querySelectorAll(".arrows__arrow");
+
+    // Dans le HTML, les flèches sont toutes rangées dans le même ordre : rouge puis jaune.
+    arrowBox.forEach((box) => {
+      if (player === 1) {
+        box.firstElementChild.style.display = "inline";
+        box.lastElementChild.style.display = "none";
+      }
+      if (player === 2) {
+        box.lastElementChild.style.display = "inline";
+        box.firstElementChild.style.display = "none";
+      }
+    });
   }
 
   makeCellBlink(lastUpdatedCellIndex, colourToFillCellWith) {
@@ -158,11 +179,43 @@ class graphicRepresentationCl {
   }
 }
 
-new boardCl(numberOfLinesOnTheBoard, numberOfColumnsOnTheBoard);
-const testBack = new gameCl();
-const testFront = new graphicRepresentationCl(numberOfLinesOnTheBoard, numberOfColumnsOnTheBoard);
-testBack.playTurn(testColumn);
-testFront.updateBoard();
+// testBack.playTurn(testColumn);
+// testFront.updateBoard();
 
 // testBack.playTurn(testColumn);
 // testFront.updateBoard();
+
+class PerformCl {
+  constructor() {
+    this.insideListener = this.insideListener.bind(this);
+    this.columnChosenByPlayer;
+    this.perform();
+  }
+
+  insideListener(event) {
+    // Cette méthode va gérer ce qui va se passer dans l'eventListener, ie quand le joueur appuie sur la flèche.
+    console.log("trig");
+    console.log("cible", event.target);
+
+    if (event.target.classList.contains("pic")) {
+      this.columnChosenByPlayer = event.target.parentElement.dataset.column;
+      console.log("colonne choisie par le joueur: ", this.columnChosenByPlayer);
+      arrows.removeEventListener("click", this.insideListener);
+    }
+  }
+
+  detectColumnChosen() {
+    // On met un event listener sur la boîte avec toutes les flèches
+    // const arrows = document.querySelector(".arrows");
+    arrows.addEventListener("click", this.insideListener);
+  }
+
+  perform() {
+    new boardCl(numberOfLinesOnTheBoard, numberOfColumnsOnTheBoard);
+    const testBack = new gameCl();
+    const testFront = new graphicRepresentationCl(numberOfLinesOnTheBoard, numberOfColumnsOnTheBoard);
+    this.detectColumnChosen();
+  }
+}
+
+new PerformCl();

@@ -10,12 +10,29 @@ body {
   height: 100vh;
 }
 
+.arrows {
+  display: flex;
+  justify-content: space-around;
+  height: 3rem;
+  width: 50%;
+  margin: auto;
+  margin-top: 2.5rem;
+  &__arrow {
+    img {
+      height: 2rem;
+      width: 3rem;
+      margin: auto;
+      display: none;
+    }
+  }
+}
+
 .board {
   height: 35rem;
   background-color: #0909c3;
   width: 50%;
   margin: auto;
-  margin-top: 5rem;
+  margin-top: 2.5rem;
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   &__cell {
