@@ -47,7 +47,6 @@ class boardCl {
         cellArray.push(new cellCl(i, j));
       }
     }
-    console.log(cellArray);
   }
 }
 
@@ -107,6 +106,7 @@ class graphicRepresentationCl {
     this.lines = lines;
     this.columns = columns;
     this.showInitialBoard();
+    this.updateBoard;
   }
 
   showInitialBoard() {
@@ -116,6 +116,29 @@ class graphicRepresentationCl {
       board = board + html;
     }
     document.querySelector(".board").innerHTML = board;
+  }
+
+  makeCellBlink(lastUpdatedCellIndex, colourToFillCellWith) {
+    // Fine out the line on which the pug will stop its descent
+    const lineOfLastUpdatedCell = cellArray[lastUpdatedCellIndex].line;
+
+    // Find out the index of the  cell on which the pug will start its descent
+    let indexOfCellToBlink = lastUpdatedCellIndex - 7 * (lineOfLastUpdatedCell - 1);
+
+    const startBlinkInterval = function () {
+      const blink = function () {
+        document.querySelector(`.board__cell--${indexOfCellToBlink}`).style.backgroundColor = colourToFillCellWith;
+        if (indexOfCellToBlink - 7 >= 0) {
+          document.querySelector(`.board__cell--${indexOfCellToBlink - 7}`).style.backgroundColor = "#ffffff";
+        }
+        indexOfCellToBlink = indexOfCellToBlink + 7;
+        if (indexOfCellToBlink > 42) {
+          clearInterval(blinkInterval);
+        }
+      };
+      const blinkInterval = setInterval(blink, 400);
+    };
+    startBlinkInterval();
   }
 
   updateBoard() {
@@ -130,9 +153,8 @@ class graphicRepresentationCl {
     if (cellArray[lastUpdatedCellIndex].redInCell) {
       colourToFillCellWith = "#ff0000";
     }
-
-    // 3°) On remplit la case modifiée sur la représentation graphique
-    document.querySelector(`.board__cell--${lastUpdatedCellIndex}`).style.backgroundColor = `${colourToFillCellWith}`;
+    this.makeCellBlink(lastUpdatedCellIndex, colourToFillCellWith);
+    console.log("cellArray", cellArray);
   }
 }
 
@@ -141,7 +163,6 @@ const testBack = new gameCl();
 const testFront = new graphicRepresentationCl(numberOfLinesOnTheBoard, numberOfColumnsOnTheBoard);
 testBack.playTurn(testColumn);
 testFront.updateBoard();
-testBack.playTurn(testColumn);
-testFront.updateBoard();
-testBack.playTurn(testColumn);
-testFront.updateBoard();
+
+// testBack.playTurn(testColumn);
+// testFront.updateBoard();
