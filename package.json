@@ -1,0 +1,23 @@
+{
+  "name": "puissance_quatre",
+  "version": "1.0.0",
+  "description": "",
+  "default": "index.html",
+  "scripts": {
+    "sass": "sass --watch ./src/sass/main.scss:./public/css/style.css",
+    "start": "parcel index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Paul-Marie-beep/power_four.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Paul-Marie-beep/power_four/issues"
+  },
+  "homepage": "https://github.com/Paul-Marie-beep/power_four#readme",
+  "dependencies": {
+    "sass": "^1.58.0"
+  }
+}

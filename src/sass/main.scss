@@ -1,0 +1,28 @@
+body {
+  margin: 0px;
+  background: linear-gradient(to top left, #7ce8fa, #7190f5);
+  background-size: cover;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  position: relative;
+}
+
+.table {
+  height: 100vh;
+}
+
+.board {
+  height: 35rem;
+  background-color: #0909c3;
+  width: 50%;
+  margin: auto;
+  margin-top: 5rem;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  &__cell {
+    border-radius: 100%;
+    background-color: white;
+    height: 4rem;
+    width: 4rem;
+    margin: auto;
+  }
+}
