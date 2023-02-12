@@ -8,6 +8,8 @@ const numberOfColumnsOnTheBoard = 7;
 // Test Values
 const testColumn = 5;
 let player;
+let testBack;
+let testFront;
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -73,13 +75,12 @@ class gameCl {
     if (roundCount > 1) {
       cellArray.find((cell) => cell.lastUpdated === true).lastUpdated = false;
     }
-
     // 1°) Find which cell we have to fill with a pug
 
     // Since we have reversed the order in the array that contains all the cells that belong to a column, we can use find because the cells in newArray are ordered from top to bottom (ie from the smallest column number to the higher). Hence, we only need the fiste value to get the forst available empty cell in that column
 
     const chosenCell = cellArray
-      .filter(function (cell) {
+      .filter((cell) => {
         return cell.column === column;
       })
       .reverse()
@@ -144,7 +145,8 @@ class graphicRepresentationCl {
     const lineOfLastUpdatedCell = cellArray[lastUpdatedCellIndex].line;
 
     // Find out the index of the  cell on which the pug will start its descent
-    let indexOfCellToBlink = lastUpdatedCellIndex - 7 * (lineOfLastUpdatedCell - 1);
+    // The '+1' is needed to convert the index from the array in the model to the graphic reprensentaiton where the first line is designated 1
+    let indexOfCellToBlink = lastUpdatedCellIndex + 1 - 7 * (lineOfLastUpdatedCell - 1);
 
     const startBlinkInterval = function () {
       const blink = function () {
@@ -174,33 +176,28 @@ class graphicRepresentationCl {
     if (cellArray[lastUpdatedCellIndex].redInCell) {
       colourToFillCellWith = "#ff0000";
     }
+
+    // On lance la descente du palet
     this.makeCellBlink(lastUpdatedCellIndex, colourToFillCellWith);
-    console.log("cellArray", cellArray);
   }
 }
-
-// testBack.playTurn(testColumn);
-// testFront.updateBoard();
-
-// testBack.playTurn(testColumn);
-// testFront.updateBoard();
 
 class PerformCl {
   constructor() {
     this.insideListener = this.insideListener.bind(this);
     this.columnChosenByPlayer;
-    this.perform();
+    this.initiateGame();
   }
 
   insideListener(event) {
     // Cette méthode va gérer ce qui va se passer dans l'eventListener, ie quand le joueur appuie sur la flèche.
-    console.log("trig");
-    console.log("cible", event.target);
 
     if (event.target.classList.contains("pic")) {
-      this.columnChosenByPlayer = event.target.parentElement.dataset.column;
-      console.log("colonne choisie par le joueur: ", this.columnChosenByPlayer);
+      // Bien convertir le numéro de colonne en number car la fonction qui en a besoin ensuite veut un number et pas une string
+      this.columnChosenByPlayer = +event.target.parentElement.dataset.column;
       arrows.removeEventListener("click", this.insideListener);
+      testBack.playTurn(this.columnChosenByPlayer);
+      testFront.updateBoard();
     }
   }
 
@@ -210,10 +207,14 @@ class PerformCl {
     arrows.addEventListener("click", this.insideListener);
   }
 
-  perform() {
+  initiateGame() {
     new boardCl(numberOfLinesOnTheBoard, numberOfColumnsOnTheBoard);
-    const testBack = new gameCl();
-    const testFront = new graphicRepresentationCl(numberOfLinesOnTheBoard, numberOfColumnsOnTheBoard);
+    testBack = new gameCl();
+    testFront = new graphicRepresentationCl(numberOfLinesOnTheBoard, numberOfColumnsOnTheBoard);
+    this.perform();
+  }
+
+  perform() {
     this.detectColumnChosen();
   }
 }
