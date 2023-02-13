@@ -17,6 +17,7 @@ const cellArray = [];
 let roundCount = 1;
 let columnChosen;
 let pugGraphicallySet = true;
+let columnIsAlreadyFilled = false;
 
 ///////////////////////////////////////////////////////////////////////////
 // DOM
@@ -84,7 +85,10 @@ class gameCl {
       .find((cell) => !cell.redInCell && !cell.yellowInCell);
 
     // First of all, make sure that nothing happens if the column is already completely filled.
-    if (!chosenCell) return;
+    if (!chosenCell) {
+      columnIsAlreadyFilled = true;
+      return;
+    }
 
     // 2°) Find the index of the corresponding  cell in the original array
     const index = cellArray.findIndex((cell) => cell.line === chosenCell.line && cell.column === chosenCell.column);
@@ -173,7 +177,7 @@ class graphicRepresentationCl {
           pugGraphicallySet = true;
         }
       };
-      const blinkInterval = setInterval(blink, 400);
+      const blinkInterval = setInterval(blink, 1);
     };
     startBlinkInterval();
   }
@@ -215,7 +219,13 @@ class ControllerCl {
       // Bien convertir le numéro de colonne en number car la fonction qui en a besoin ensuite veut un number et pas une string
       this.columnChosenByPlayer = +event.target.parentElement.dataset.column;
       testBack.updateModel(this.columnChosenByPlayer);
-      testFront.updateBoard();
+      if (columnIsAlreadyFilled === false) {
+        testFront.updateBoard();
+      } else {
+        // We set the variables put in the guard functions back to values that enable the next pug to be played
+        columnIsAlreadyFilled = false;
+        pugGraphicallySet = true;
+      }
     }
   }
 
