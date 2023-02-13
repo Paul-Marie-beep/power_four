@@ -16,6 +16,7 @@ let testFront;
 const cellArray = [];
 let roundCount = 1;
 let columnChosen;
+let pugGraphicallySet = true;
 
 ///////////////////////////////////////////////////////////////////////////
 // DOM
@@ -70,7 +71,7 @@ class gameCl {
     }
   }
 
-  playTurn(column) {
+  updateModel(column) {
     // First of all, erase the information of the last filled cell
     if (roundCount > 1) {
       cellArray.find((cell) => cell.lastUpdated === true).lastUpdated = false;
@@ -145,18 +146,27 @@ class graphicRepresentationCl {
     const lineOfLastUpdatedCell = cellArray[lastUpdatedCellIndex].line;
 
     // Find out the index of the  cell on which the pug will start its descent
-    // The '+1' is needed to convert the index from the array in the model to the graphic reprensentaiton where the first line is designated 1
-    let indexOfCellToBlink = lastUpdatedCellIndex + 1 - 7 * (lineOfLastUpdatedCell - 1);
+    // The '+1' is needed to convert the index from the array in the model to the graphic reprensentation where the first line is designated 1
+    let numberOfCellToBlink = lastUpdatedCellIndex + 1 - 7 * (lineOfLastUpdatedCell - 1);
 
     const startBlinkInterval = function () {
       const blink = function () {
-        document.querySelector(`.board__cell--${indexOfCellToBlink}`).style.backgroundColor = colourToFillCellWith;
-        if (indexOfCellToBlink - 7 >= 0) {
-          document.querySelector(`.board__cell--${indexOfCellToBlink - 7}`).style.backgroundColor = "#ffffff";
+        document.querySelector(`.board__cell--${numberOfCellToBlink}`).style.backgroundColor = colourToFillCellWith;
+
+        // Si on est sur la seconde ligne ou plus bas, on "reblanchit" la ligne précédente. Aucune raison de le faire si on est sur la première ligne évidemment.
+        if (numberOfCellToBlink - 7 >= 0) {
+          document.querySelector(`.board__cell--${numberOfCellToBlink - 7}`).style.backgroundColor = "#ffffff";
         }
-        indexOfCellToBlink = indexOfCellToBlink + 7;
-        if (indexOfCellToBlink > 42) {
+        // On passe à la ligne d'en dessous.
+        numberOfCellToBlink = numberOfCellToBlink + 7;
+
+        // On arrête le clignotement quand le palet a atteint sa position finale. (toujours le '+1' pour passer de l'index de l'array du model à numéro de case dans la représentation graphique).
+        // Ensuite on montre les flèches de la couleur du nouveau joueur.
+        // Puis on indique que le palet est en place et que l'on peut donner une nouvelle instruction.
+        if (numberOfCellToBlink > lastUpdatedCellIndex + 1) {
           clearInterval(blinkInterval);
+          testFront.showArrows();
+          pugGraphicallySet = true;
         }
       };
       const blinkInterval = setInterval(blink, 400);
@@ -182,7 +192,7 @@ class graphicRepresentationCl {
   }
 }
 
-class PerformCl {
+class ControllerCl {
   constructor() {
     this.insideListener = this.insideListener.bind(this);
     this.columnChosenByPlayer;
@@ -192,16 +202,21 @@ class PerformCl {
   insideListener(event) {
     // Cette méthode va gérer ce qui va se passer dans l'eventListener, ie quand le joueur appuie sur la flèche.
 
+    // Guard to prevent anything from happening until the puck is set in its final cell
+    if (!pugGraphicallySet) return;
+
     if (event.target.classList.contains("pic")) {
+      // We state that the pug is currently descending
+      pugGraphicallySet = false;
       // Bien convertir le numéro de colonne en number car la fonction qui en a besoin ensuite veut un number et pas une string
       this.columnChosenByPlayer = +event.target.parentElement.dataset.column;
-      arrows.removeEventListener("click", this.insideListener);
-      testBack.playTurn(this.columnChosenByPlayer);
+      testBack.updateModel(this.columnChosenByPlayer);
       testFront.updateBoard();
+      this.perform();
     }
   }
 
-  detectColumnChosen() {
+  playTurn() {
     // On met un event listener sur la boîte avec toutes les flèches
     // const arrows = document.querySelector(".arrows");
     arrows.addEventListener("click", this.insideListener);
@@ -215,8 +230,8 @@ class PerformCl {
   }
 
   perform() {
-    this.detectColumnChosen();
+    this.playTurn();
   }
 }
 
-new PerformCl();
+new ControllerCl();
