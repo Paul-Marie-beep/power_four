@@ -216,24 +216,14 @@ class ControllerCl {
       this.columnChosenByPlayer = +event.target.parentElement.dataset.column;
       testBack.updateModel(this.columnChosenByPlayer);
       testFront.updateBoard();
-      this.perform();
     }
-  }
-
-  playTurn() {
-    // On met un event listener sur la boîte avec toutes les flèches
-    arrows.addEventListener("click", this.insideListener);
   }
 
   initiateGame() {
     new boardCl(numberOfLinesOnTheBoard, numberOfColumnsOnTheBoard);
     testBack = new gameCl();
     testFront = new graphicRepresentationCl(numberOfLinesOnTheBoard, numberOfColumnsOnTheBoard);
-    this.perform();
-  }
-
-  perform() {
-    this.playTurn();
+    arrows.addEventListener("click", this.insideListener);
   }
 }
 
