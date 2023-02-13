@@ -72,10 +72,6 @@ class gameCl {
   }
 
   updateModel(column) {
-    // First of all, erase the information of the last filled cell
-    if (roundCount > 1) {
-      cellArray.find((cell) => cell.lastUpdated === true).lastUpdated = false;
-    }
     // 1°) Find which cell we have to fill with a pug
 
     // Since we have reversed the order in the array that contains all the cells that belong to a column, we can use find because the cells in newArray are ordered from top to bottom (ie from the smallest column number to the higher). Hence, we only need the fiste value to get the forst available empty cell in that column
@@ -87,6 +83,9 @@ class gameCl {
       .reverse()
       .find((cell) => !cell.redInCell && !cell.yellowInCell);
 
+    // First of all, make sure that nothing happens if the column is already completely filled.
+    if (!chosenCell) return;
+
     // 2°) Find the index of the corresponding  cell in the original array
     const index = cellArray.findIndex((cell) => cell.line === chosenCell.line && cell.column === chosenCell.column);
 
@@ -96,6 +95,11 @@ class gameCl {
     }
     if (player === 2) {
       cellArray[index].yellowInCell = true;
+    }
+
+    // erase the information of the last filled cell
+    if (roundCount > 1) {
+      cellArray.find((cell) => cell.lastUpdated === true).lastUpdated = false;
     }
     cellArray[index].lastUpdated = true;
     roundCount++;
@@ -218,7 +222,6 @@ class ControllerCl {
 
   playTurn() {
     // On met un event listener sur la boîte avec toutes les flèches
-    // const arrows = document.querySelector(".arrows");
     arrows.addEventListener("click", this.insideListener);
   }
 
