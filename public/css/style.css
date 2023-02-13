@@ -1,0 +1,49 @@
+body {
+  margin: 0px;
+  background: linear-gradient(to top left, #7ce8fa, #7190f5);
+  background-size: cover;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  position: relative;
+}
+
+.table {
+  height: 100vh;
+}
+
+.arrows {
+  display: flex;
+  justify-content: space-around;
+  height: 3rem;
+  width: 50%;
+  margin: auto;
+  margin-top: 2.5rem;
+}
+.arrows__arrow img {
+  height: 2rem;
+  width: 3rem;
+  margin: auto;
+  display: none;
+}
+
+.board {
+  height: 35rem;
+  background-color: #0909c3;
+  width: 50%;
+  margin: auto;
+  margin-top: 2.5rem;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+.board__cell {
+  border-radius: 100%;
+  background-color: white;
+  height: 4rem;
+  width: 4rem;
+  margin: auto;
+}
+
+.test {
+  color: #ffffff;
+}
+
+/*# sourceMappingURL=style.css.map */
