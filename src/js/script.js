@@ -111,6 +111,13 @@ class gameCl {
     // 4°) Change the player
     this.chosePlayer();
   }
+
+  testForVictory() {
+    // The condition is "43" because since the round count is updated at the end of a round, it increments before the round is actually played.
+    if (roundCount === 43) {
+      console.log("Match nul, personne ne gagne");
+    }
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -162,9 +169,10 @@ class graphicRepresentationCl {
         document.querySelector(`.board__cell--${numberOfCellToBlink}`).style.backgroundColor = colourToFillCellWith;
 
         // Si on est sur la seconde ligne ou plus bas, on "reblanchit" la ligne précédente. Aucune raison de le faire si on est sur la première ligne évidemment.
-        if (numberOfCellToBlink - 7 >= 0) {
+        if (numberOfCellToBlink - 7 > 0) {
           document.querySelector(`.board__cell--${numberOfCellToBlink - 7}`).style.backgroundColor = "#ffffff";
         }
+
         // On passe à la ligne d'en dessous.
         numberOfCellToBlink = numberOfCellToBlink + 7;
 
@@ -219,9 +227,12 @@ class ControllerCl {
       // Bien convertir le numéro de colonne en number car la fonction qui en a besoin ensuite veut un number et pas une string
       this.columnChosenByPlayer = +event.target.parentElement.dataset.column;
       testBack.updateModel(this.columnChosenByPlayer);
+      testBack.testForVictory();
       if (columnIsAlreadyFilled === false) {
+        // If the pug is played in a column that is not already full, we can update the graphical representation
         testFront.updateBoard();
       } else {
+        // No update of graphic representation
         // We set the variables put in the guard functions back to values that enable the next pug to be played
         columnIsAlreadyFilled = false;
         pugGraphicallySet = true;
