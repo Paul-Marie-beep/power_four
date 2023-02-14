@@ -140,7 +140,6 @@ class gameCl {
 
   columnTest() {
     const columnArray = cellArray.filter((cell) => cell.column === this.chosenCell.column);
-    console.log("columnArray", columnArray);
     let conditionOfVictory;
 
     for (let i = 0; i <= 2; i++) {
@@ -160,6 +159,7 @@ class gameCl {
 
       if (conditionOfVictory) {
         console.log(`Il y a un gagnant, victoire du joueur ${player} !!!`);
+        return;
       }
     }
   }
