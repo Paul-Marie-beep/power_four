@@ -32,15 +32,6 @@ class cellCl {
     this.yellowInCell = false;
     this.lastUpdated = false;
   }
-
-  // For the time being, we are going to show the fall of the puck as something purely graphic and assign it directly to the first available cell.
-  addYellowPuckInCell() {
-    this.redInCell = true;
-  }
-
-  addRedPuckInCell() {
-    this.yellowInCell = true;
-  }
 }
 
 class boardCl {
@@ -114,6 +105,7 @@ class gameCl {
 
   countTest() {
     // If the board is full, it is a draw
+    // The condition is "43" because since the round count is updated at the end of a round, it increments before the round is actually played.
     if (roundCount === 43) {
       console.log("Match nul, personne ne gagne");
     }
@@ -217,9 +209,50 @@ class gameCl {
     }
   }
 
-  testForVictory() {
-    // The condition is "43" because since the round count is updated at the end of a round, it increments before the round is actually played.
+  diagUpTest() {
+    // We put the last cell played in the array of the left to right diagonal
+    let diagUpArray = [this.chosenCell];
 
+    // We start filling the array with cells that are left to the chosen cell on the diagonal
+    for (let i = 1; i <= this.chosenCell.column; i++) {
+      if (diagUpArray[diagUpArray.length - 1].column === 1 || diagUpArray[diagUpArray.length - 1].line === 6) break;
+
+      diagUpArray.push(cellArray[cellArray.indexOf(this.chosenCell) + i * 6]);
+    }
+    // We then fill the array with cell that are right to the the chosen cell on the diagonal
+    for (let i = 1; i <= 7 - this.chosenCell.column; i++) {
+      if (diagUpArray[0].column === 7 || diagUpArray[0].line === 1) break;
+
+      diagUpArray.unshift(cellArray[cellArray.indexOf(this.chosenCell) - i * 6]);
+    }
+    console.log("array remplissage  + droite", diagUpArray);
+
+    let conditionOfVictory;
+    if (diagUpArray.length >= 4) {
+      for (let i = 0; i < diagUpArray.length - 3; i++) {
+        if (player === 1) {
+          conditionOfVictory =
+            diagUpArray[i].redInCell &&
+            diagUpArray[i + 1].redInCell &&
+            diagUpArray[i + 2].redInCell &&
+            diagUpArray[i + 3].redInCell;
+        }
+        if (player === 2) {
+          conditionOfVictory =
+            diagUpArray[i].yellowInCell &&
+            diagUpArray[i + 1].yellowInCell &&
+            diagUpArray[i + 2].yellowInCell &&
+            diagUpArray[i + 3].yellowInCell;
+        }
+        if (conditionOfVictory) {
+          console.log(`Il y a un gagnant, victoire du joueur ${player} !!!`);
+          return;
+        }
+      }
+    }
+  }
+
+  testForVictory() {
     this.countTest();
 
     this.lineTest();
@@ -227,6 +260,8 @@ class gameCl {
     this.columnTest();
 
     this.diagDownTest();
+
+    this.diagUpTest();
 
     // 4°) Change the player
     this.chosePlayer();
