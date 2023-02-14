@@ -103,11 +103,21 @@ class gameCl {
     roundCount++;
   }
 
+  ///////////////////////////////////////////////////////////////
+  // TEST FOR VICTORY
+
   countTest() {
     // If the board is full, it is a draw
     // The condition is "43" because since the round count is updated at the end of a round, it increments before the round is actually played.
     if (roundCount === 43) {
       console.log("Match nul, personne ne gagne");
+    }
+  }
+
+  checkCondition(condition, provenance) {
+    if (condition) {
+      console.log(`Il y a un gagnant, victoire du joueur ${player} !!!`, provenance);
+      return;
     }
   }
 
@@ -131,10 +141,7 @@ class gameCl {
           lineArray[i + 3].yellowInCell;
       }
 
-      if (conditionOfVictory) {
-        console.log(`Il y a un gagnant, victoire du joueur ${player} !!!`);
-        return;
-      }
+      this.checkCondition(conditionOfVictory, "line");
     }
   }
 
@@ -158,10 +165,7 @@ class gameCl {
           columnArray[i + 3].yellowInCell;
       }
 
-      if (conditionOfVictory) {
-        console.log(`Il y a un gagnant, victoire du joueur ${player} !!!`);
-        return;
-      }
+      this.checkCondition(conditionOfVictory, "column");
     }
   }
 
@@ -201,11 +205,8 @@ class gameCl {
             diagDownArray[i + 2].yellowInCell &&
             diagDownArray[i + 3].yellowInCell;
         }
-        if (conditionOfVictory) {
-          console.log(`Il y a un gagnant, victoire du joueur ${player} !!!`);
-          return;
-        }
       }
+      this.checkCondition(conditionOfVictory, "diagdown");
     }
   }
 
@@ -225,7 +226,6 @@ class gameCl {
 
       diagUpArray.unshift(cellArray[cellArray.indexOf(this.chosenCell) - i * 6]);
     }
-    console.log("array remplissage  + droite", diagUpArray);
 
     let conditionOfVictory;
     if (diagUpArray.length >= 4) {
@@ -244,11 +244,8 @@ class gameCl {
             diagUpArray[i + 2].yellowInCell &&
             diagUpArray[i + 3].yellowInCell;
         }
-        if (conditionOfVictory) {
-          console.log(`Il y a un gagnant, victoire du joueur ${player} !!!`);
-          return;
-        }
       }
+      this.checkCondition(conditionOfVictory, "diagUp");
     }
   }
 
