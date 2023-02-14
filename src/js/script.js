@@ -121,26 +121,23 @@ class gameCl {
     }
   }
 
+  defineCondition(array, i) {
+    if (player === 1) {
+      return array[i].redInCell && array[i + 1].redInCell && array[i + 2].redInCell && array[i + 3].redInCell;
+    } else {
+      return (
+        array[i].yellowInCell && array[i + 1].yellowInCell && array[i + 2].yellowInCell && array[i + 3].yellowInCell
+      );
+    }
+  }
+
   lineTest() {
     // Function to test if a line of 4 consecutive pugs is achieved
     const lineArray = cellArray.filter((cell) => cell.line === this.chosenCell.line);
     let conditionOfVictory;
 
     for (let i = 0; i <= 3; i++) {
-      if (player === 1) {
-        conditionOfVictory =
-          lineArray[i].redInCell &&
-          lineArray[i + 1].redInCell &&
-          lineArray[i + 2].redInCell &&
-          lineArray[i + 3].redInCell;
-      } else {
-        conditionOfVictory =
-          lineArray[i].yellowInCell &&
-          lineArray[i + 1].yellowInCell &&
-          lineArray[i + 2].yellowInCell &&
-          lineArray[i + 3].yellowInCell;
-      }
-
+      conditionOfVictory = this.defineCondition(lineArray, i);
       this.checkCondition(conditionOfVictory, "line");
     }
   }
@@ -151,20 +148,7 @@ class gameCl {
     let conditionOfVictory;
 
     for (let i = 0; i <= 2; i++) {
-      if (player === 1) {
-        conditionOfVictory =
-          columnArray[i].redInCell &&
-          columnArray[i + 1].redInCell &&
-          columnArray[i + 2].redInCell &&
-          columnArray[i + 3].redInCell;
-      } else {
-        conditionOfVictory =
-          columnArray[i].yellowInCell &&
-          columnArray[i + 1].yellowInCell &&
-          columnArray[i + 2].yellowInCell &&
-          columnArray[i + 3].yellowInCell;
-      }
-
+      conditionOfVictory = this.defineCondition(columnArray, i);
       this.checkCondition(conditionOfVictory, "column");
     }
   }
@@ -191,22 +175,9 @@ class gameCl {
     let conditionOfVictory;
     if (diagDownArray.length >= 4) {
       for (let i = 0; i < diagDownArray.length - 3; i++) {
-        if (player === 1) {
-          conditionOfVictory =
-            diagDownArray[i].redInCell &&
-            diagDownArray[i + 1].redInCell &&
-            diagDownArray[i + 2].redInCell &&
-            diagDownArray[i + 3].redInCell;
-        }
-        if (player === 2) {
-          conditionOfVictory =
-            diagDownArray[i].yellowInCell &&
-            diagDownArray[i + 1].yellowInCell &&
-            diagDownArray[i + 2].yellowInCell &&
-            diagDownArray[i + 3].yellowInCell;
-        }
+        conditionOfVictory = this.defineCondition(diagDownArray, i);
+        this.checkCondition(conditionOfVictory, "diagdown");
       }
-      this.checkCondition(conditionOfVictory, "diagdown");
     }
   }
 
@@ -230,22 +201,9 @@ class gameCl {
     let conditionOfVictory;
     if (diagUpArray.length >= 4) {
       for (let i = 0; i < diagUpArray.length - 3; i++) {
-        if (player === 1) {
-          conditionOfVictory =
-            diagUpArray[i].redInCell &&
-            diagUpArray[i + 1].redInCell &&
-            diagUpArray[i + 2].redInCell &&
-            diagUpArray[i + 3].redInCell;
-        }
-        if (player === 2) {
-          conditionOfVictory =
-            diagUpArray[i].yellowInCell &&
-            diagUpArray[i + 1].yellowInCell &&
-            diagUpArray[i + 2].yellowInCell &&
-            diagUpArray[i + 3].yellowInCell;
-        }
+        conditionOfVictory = this.defineCondition(diagUpArray, i);
+        this.checkCondition(conditionOfVictory, "diagUp");
       }
-      this.checkCondition(conditionOfVictory, "diagUp");
     }
   }
 
