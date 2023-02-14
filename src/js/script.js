@@ -112,7 +112,15 @@ class gameCl {
     roundCount++;
   }
 
+  countTest() {
+    // If the board is full, it is a draw
+    if (roundCount === 43) {
+      console.log("Match nul, personne ne gagne");
+    }
+  }
+
   lineTest() {
+    // Function to test if a line of 4 consecutive pugs is achieved
     const lineArray = cellArray.filter((cell) => cell.line === this.chosenCell.line);
     let conditionOfVictory;
 
@@ -139,6 +147,7 @@ class gameCl {
   }
 
   columnTest() {
+    // Function to test if a column of 4 consecutive pugs is achieved
     const columnArray = cellArray.filter((cell) => cell.column === this.chosenCell.column);
     let conditionOfVictory;
 
@@ -164,9 +173,47 @@ class gameCl {
     }
   }
 
-  countTest() {
-    if (roundCount === 43) {
-      console.log("Match nul, personne ne gagne");
+  diagDownTest() {
+    // We put the last cell played in the array of the left to right diagonal
+    let diagDownArray = [this.chosenCell];
+
+    // We start filling the array with cells that are left to the chosen cell on the diagonal
+    for (let i = 1; i <= this.chosenCell.column; i++) {
+      if (diagDownArray[0].column === 1 || diagDownArray[0].line === 1) break;
+
+      diagDownArray.unshift(cellArray[cellArray.indexOf(this.chosenCell) - i * 8]);
+    }
+
+    // We then fill the array with cell that are right to the the chosen cell on the diagonal
+    for (let i = 1; i <= 7 - this.chosenCell.column; i++) {
+      if (diagDownArray[diagDownArray.length - 1].column === 7 || diagDownArray[diagDownArray.length - 1].line === 6)
+        break;
+      diagDownArray.push(cellArray[cellArray.indexOf(this.chosenCell) + i * 8]);
+    }
+
+    // We test our array to check if there are four consecutive cells of the same colour
+    let conditionOfVictory;
+    if (diagDownArray.length >= 4) {
+      for (let i = 0; i < diagDownArray.length - 3; i++) {
+        if (player === 1) {
+          conditionOfVictory =
+            diagDownArray[i].redInCell &&
+            diagDownArray[i + 1].redInCell &&
+            diagDownArray[i + 2].redInCell &&
+            diagDownArray[i + 3].redInCell;
+        }
+        if (player === 2) {
+          conditionOfVictory =
+            diagDownArray[i].yellowInCell &&
+            diagDownArray[i + 1].yellowInCell &&
+            diagDownArray[i + 2].yellowInCell &&
+            diagDownArray[i + 3].yellowInCell;
+        }
+        if (conditionOfVictory) {
+          console.log(`Il y a un gagnant, victoire du joueur ${player} !!!`);
+          return;
+        }
+      }
     }
   }
 
@@ -178,6 +225,8 @@ class gameCl {
     this.lineTest();
 
     this.columnTest();
+
+    this.diagDownTest();
 
     // 4°) Change the player
     this.chosePlayer();
@@ -291,9 +340,9 @@ class ControllerCl {
       // Bien convertir le numéro de colonne en number car la fonction qui en a besoin ensuite veut un number et pas une string
       this.columnChosenByPlayer = +event.target.parentElement.dataset.column;
       testBack.updateModel(this.columnChosenByPlayer);
-      testBack.testForVictory();
       if (columnIsAlreadyFilled === false) {
         // If the pug is played in a column that is not already full, we can update the graphical representation
+        testBack.testForVictory();
         testFront.updateBoard();
       } else {
         // No update of graphic representation
