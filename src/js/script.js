@@ -62,6 +62,7 @@ class boardCl {
 class gameCl {
   constructor() {
     this.chosePlayer();
+    this.chosenCell;
   }
 
   chosePlayer() {
@@ -77,7 +78,7 @@ class gameCl {
 
     // Since we have reversed the order in the array that contains all the cells that belong to a column, we can use find because the cells in newArray are ordered from top to bottom (ie from the smallest column number to the higher). Hence, we only need the fiste value to get the forst available empty cell in that column
 
-    const chosenCell = cellArray
+    this.chosenCell = cellArray
       .filter((cell) => {
         return cell.column === column;
       })
@@ -85,13 +86,15 @@ class gameCl {
       .find((cell) => !cell.redInCell && !cell.yellowInCell);
 
     // First of all, make sure that nothing happens if the column is already completely filled.
-    if (!chosenCell) {
+    if (!this.chosenCell) {
       columnIsAlreadyFilled = true;
       return;
     }
 
     // 2°) Find the index of the corresponding  cell in the original array
-    const index = cellArray.findIndex((cell) => cell.line === chosenCell.line && cell.column === chosenCell.column);
+    const index = cellArray.findIndex(
+      (cell) => cell.line === this.chosenCell.line && cell.column === this.chosenCell.column
+    );
 
     // 3°) Fill the cell in the original array with the right colour
     if (player === 1) {
@@ -107,16 +110,77 @@ class gameCl {
     }
     cellArray[index].lastUpdated = true;
     roundCount++;
+  }
 
-    // 4°) Change the player
-    this.chosePlayer();
+  lineTest() {
+    const lineArray = cellArray.filter((cell) => cell.line === this.chosenCell.line);
+    let conditionOfVictory;
+
+    for (let i = 0; i <= 3; i++) {
+      if (player === 1) {
+        conditionOfVictory =
+          lineArray[i].redInCell &&
+          lineArray[i + 1].redInCell &&
+          lineArray[i + 2].redInCell &&
+          lineArray[i + 3].redInCell;
+      } else {
+        conditionOfVictory =
+          lineArray[i].yellowInCell &&
+          lineArray[i + 1].yellowInCell &&
+          lineArray[i + 2].yellowInCell &&
+          lineArray[i + 3].yellowInCell;
+      }
+
+      if (conditionOfVictory) {
+        console.log(`Il y a un gagnant, victoire du joueur ${player} !!!`);
+        return;
+      }
+    }
+  }
+
+  columnTest() {
+    const columnArray = cellArray.filter((cell) => cell.column === this.chosenCell.column);
+    console.log("columnArray", columnArray);
+    let conditionOfVictory;
+
+    for (let i = 0; i <= 2; i++) {
+      if (player === 1) {
+        conditionOfVictory =
+          columnArray[i].redInCell &&
+          columnArray[i + 1].redInCell &&
+          columnArray[i + 2].redInCell &&
+          columnArray[i + 3].redInCell;
+      } else {
+        conditionOfVictory =
+          columnArray[i].yellowInCell &&
+          columnArray[i + 1].yellowInCell &&
+          columnArray[i + 2].yellowInCell &&
+          columnArray[i + 3].yellowInCell;
+      }
+
+      if (conditionOfVictory) {
+        console.log(`Il y a un gagnant, victoire du joueur ${player} !!!`);
+      }
+    }
+  }
+
+  countTest() {
+    if (roundCount === 43) {
+      console.log("Match nul, personne ne gagne");
+    }
   }
 
   testForVictory() {
     // The condition is "43" because since the round count is updated at the end of a round, it increments before the round is actually played.
-    if (roundCount === 43) {
-      console.log("Match nul, personne ne gagne");
-    }
+
+    this.countTest();
+
+    this.lineTest();
+
+    this.columnTest();
+
+    // 4°) Change the player
+    this.chosePlayer();
   }
 }
 
