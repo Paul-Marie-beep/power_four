@@ -264,7 +264,7 @@ class graphicRepresentationCl {
     }
   }
 
-  makeCellBlink(lastUpdatedCellIndex, colourToFillCellWith) {
+  makeCellBlink(lastUpdatedCellIndex) {
     // Fine out the line on which the pug will stop its descent
     const lineOfLastUpdatedCell = cellArray[lastUpdatedCellIndex].line;
 
@@ -281,8 +281,9 @@ class graphicRepresentationCl {
 
         // Si on est sur la seconde ligne ou plus bas, on "reblanchit" la ligne précédente. Aucune raison de le faire si on est sur la première ligne évidemment.
         if (numberOfCellToBlink - 7 > 0) {
-          document.querySelector(`.board__cell--${numberOfCellToBlink - 7}`).classList.remove("red");
-          document.querySelector(`.board__cell--${numberOfCellToBlink - 7}`).classList.remove("yellow");
+          document.querySelector(`.board__cell--${numberOfCellToBlink - 7}`).classList.contains("red")
+            ? document.querySelector(`.board__cell--${numberOfCellToBlink - 7}`).classList.remove("red")
+            : document.querySelector(`.board__cell--${numberOfCellToBlink - 7}`).classList.remove("yellow");
         }
 
         // On passe à la ligne d'en dessous.
@@ -297,7 +298,7 @@ class graphicRepresentationCl {
           pugGraphicallySet = true;
         }
       };
-      const blinkInterval = setInterval(blink, 1);
+      const blinkInterval = setInterval(blink, 400);
     };
     startBlinkInterval();
   }
@@ -316,11 +317,10 @@ class graphicRepresentationCl {
   showVictoriousPugs(arrayOfindexes) {
     // We find the colours of the winning cells
     const colourToFillCellWith = this.defineColourToFillCellWith(arrayOfindexes[0]);
-    console.log("couleur victorieuse reconnue par la représentation graphique", colourToFillCellWith);
     // We gather the Dom elements representing the winning cells into an array
     const vicArrayGraph = [];
     arrayOfindexes.forEach((index) => vicArrayGraph.push(document.querySelector(`.board__cell--${index + 1}`)));
-    // We then make these cells blink
+    // We then make these cells blink.
     const startWiningBlinkInterval = function () {
       const blink = function () {
         vicArrayGraph.forEach((div) => div.classList.toggle(`${colourToFillCellWith}`));
