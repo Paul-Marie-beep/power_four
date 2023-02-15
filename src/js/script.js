@@ -127,18 +127,15 @@ class gameCl {
   fillVictoryArray(array, i) {
     // function to gather the four consecutive pugs of the same colour in one array
     const vicArrayValues = [array[i], array[i + 1], array[i + 2], array[i + 3]];
-    vicArrayValues.forEach((value) => this.vicArray.push(cellArray[cellArray.indexOf(value)]));
-    console.log("victoire du joueur :", player, "||  tableau des valeurs gagnantes", this.vicArray);
+    vicArrayValues.forEach((value) => this.vicArray.push(cellArray.indexOf(value)));
   }
 
   lineTest() {
     // Function to test if a line of 4 consecutive pugs is achieved
     const lineArray = cellArray.filter((cell) => cell.line === this.chosenCell.line);
-    let conditionOfVictory;
 
     for (let i = 0; i <= 3; i++) {
-      conditionOfVictory = this.defineCondition(lineArray, i);
-      if (conditionOfVictory) {
+      if (this.defineCondition(lineArray, i)) {
         this.fillVictoryArray(lineArray, i);
         return true;
       }
@@ -148,11 +145,9 @@ class gameCl {
   columnTest() {
     // Function to test if a column of 4 consecutive pugs is achieved
     const columnArray = cellArray.filter((cell) => cell.column === this.chosenCell.column);
-    let conditionOfVictory;
 
     for (let i = 0; i <= 2; i++) {
-      conditionOfVictory = this.defineCondition(columnArray, i);
-      if (conditionOfVictory) {
+      if (this.defineCondition(columnArray, i)) {
         this.fillVictoryArray(columnArray, i);
         return true;
       }
@@ -178,11 +173,10 @@ class gameCl {
     }
 
     // We test our array to check if there are four consecutive cells of the same colour
-    let conditionOfVictory;
+    // No need to do it if the diagonal is made of less than 4 cells
     if (diagDownArray.length >= 4) {
       for (let i = 0; i < diagDownArray.length - 3; i++) {
-        conditionOfVictory = this.defineCondition(diagDownArray, i);
-        if (conditionOfVictory) {
+        if (this.defineCondition(diagDownArray, i)) {
           this.fillVictoryArray(diagDownArray, i);
           return true;
         }
@@ -207,11 +201,9 @@ class gameCl {
       diagUpArray.unshift(cellArray[cellArray.indexOf(this.chosenCell) - i * 6]);
     }
 
-    let conditionOfVictory;
     if (diagUpArray.length >= 4) {
       for (let i = 0; i < diagUpArray.length - 3; i++) {
-        conditionOfVictory = this.defineCondition(diagUpArray, i);
-        if (conditionOfVictory) {
+        if (this.defineCondition(diagUpArray, i)) {
           this.fillVictoryArray(diagUpArray, i);
           return true;
         }
@@ -262,6 +254,16 @@ class graphicRepresentationCl {
     });
   }
 
+  defineColourToFillCellWith(cellIndex) {
+    // Function to define which colour will appear on graphical representation
+    if (cellArray[cellIndex].yellowInCell) {
+      return "yellow";
+    }
+    if (cellArray[cellIndex].redInCell) {
+      return "red";
+    }
+  }
+
   makeCellBlink(lastUpdatedCellIndex, colourToFillCellWith) {
     // Fine out the line on which the pug will stop its descent
     const lineOfLastUpdatedCell = cellArray[lastUpdatedCellIndex].line;
@@ -270,13 +272,17 @@ class graphicRepresentationCl {
     // The '+1' is needed to convert the index from the array in the model to the graphic reprensentation where the first line is designated 1
     let numberOfCellToBlink = lastUpdatedCellIndex + 1 - 7 * (lineOfLastUpdatedCell - 1);
 
+    const filling = this.defineColourToFillCellWith(lastUpdatedCellIndex);
+    console.log("filling", filling);
+
     const startBlinkInterval = function () {
       const blink = function () {
-        document.querySelector(`.board__cell--${numberOfCellToBlink}`).style.backgroundColor = colourToFillCellWith;
+        document.querySelector(`.board__cell--${numberOfCellToBlink}`).classList.add(`${filling}`);
 
         // Si on est sur la seconde ligne ou plus bas, on "reblanchit" la ligne précédente. Aucune raison de le faire si on est sur la première ligne évidemment.
         if (numberOfCellToBlink - 7 > 0) {
-          document.querySelector(`.board__cell--${numberOfCellToBlink - 7}`).style.backgroundColor = "#ffffff";
+          document.querySelector(`.board__cell--${numberOfCellToBlink - 7}`).classList.remove("red");
+          document.querySelector(`.board__cell--${numberOfCellToBlink - 7}`).classList.remove("yellow");
         }
 
         // On passe à la ligne d'en dessous.
@@ -301,16 +307,27 @@ class graphicRepresentationCl {
     const lastUpdatedCellIndex = cellArray.findIndex((cell) => cell.lastUpdated === true);
 
     // 2°) On définit la couleur avec laquelle ont veut remplir la case
-    let colourToFillCellWith;
-    if (cellArray[lastUpdatedCellIndex].yellowInCell) {
-      colourToFillCellWith = "#ffff00";
-    }
-    if (cellArray[lastUpdatedCellIndex].redInCell) {
-      colourToFillCellWith = "#ff0000";
-    }
+    const colourToFillCellWith = this.defineColourToFillCellWith(lastUpdatedCellIndex);
 
     // On lance la descente du palet
     this.makeCellBlink(lastUpdatedCellIndex, colourToFillCellWith);
+  }
+
+  showVictoriousPugs(arrayOfindexes) {
+    // We find the colours of the winning cells
+    const colourToFillCellWith = this.defineColourToFillCellWith(arrayOfindexes[0]);
+    console.log("couleur victorieuse reconnue par la représentation graphique", colourToFillCellWith);
+    // We gather the Dom elements representing the winning cells into an array
+    const vicArrayGraph = [];
+    arrayOfindexes.forEach((index) => vicArrayGraph.push(document.querySelector(`.board__cell--${index + 1}`)));
+    // We then make these cells blink
+    const startWiningBlinkInterval = function () {
+      const blink = function () {
+        vicArrayGraph.forEach((div) => div.classList.toggle(`${colourToFillCellWith}`));
+      };
+      const blinkInterval = setInterval(blink, 400);
+    };
+    startWiningBlinkInterval();
   }
 }
 
@@ -319,6 +336,19 @@ class ControllerCl {
     this.insideListener = this.insideListener.bind(this);
     this.columnChosenByPlayer;
     this.initiateGame();
+  }
+
+  actionsAfterVictory() {
+    console.log(
+      "!! annonce victoire dans le controller !!",
+      "victoire du joueur :",
+      player,
+      "|| tableau des valeurs de victoire :",
+      testBack.vicArray
+    );
+    arrows.removeEventListener("click", this.insideListener);
+    // Show a graphical representation of the winning combination
+    testFront.showVictoriousPugs(testBack.vicArray);
   }
 
   insideListener(event) {
@@ -338,7 +368,7 @@ class ControllerCl {
         testFront.updateBoard();
         if (testBack.testForVictory()) {
           // Of the conditions for victory are met, we...
-          console.log("annonce victoire dans le controller", "victoire du joueur :", player);
+          this.actionsAfterVictory();
         } else {
           // If there is no victory, we change player
           testBack.chosePlayer();
