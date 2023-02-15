@@ -6,8 +6,6 @@ const numberOfColumnsOnTheBoard = 7;
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Test Values
-const testColumn = 5;
-let player;
 let testBack;
 let testFront;
 
@@ -15,6 +13,7 @@ let testFront;
 
 const cellArray = [];
 let roundCount = 1;
+let player;
 let columnChosen;
 let pugGraphicallySet = true;
 let columnIsAlreadyFilled = false;
@@ -54,6 +53,7 @@ class gameCl {
   constructor() {
     this.chosePlayer();
     this.chosenCell;
+    this.vicArray = [];
   }
 
   chosePlayer() {
@@ -114,13 +114,6 @@ class gameCl {
     }
   }
 
-  checkCondition(condition, provenance) {
-    if (condition) {
-      console.log(`Il y a un gagnant, victoire du joueur ${player} !!!`, provenance);
-      return;
-    }
-  }
-
   defineCondition(array, i) {
     if (player === 1) {
       return array[i].redInCell && array[i + 1].redInCell && array[i + 2].redInCell && array[i + 3].redInCell;
@@ -131,6 +124,13 @@ class gameCl {
     }
   }
 
+  fillVictoryArray(array, i) {
+    // function to gather the four consecutive pugs of the same colour in one array
+    const vicArrayValues = [array[i], array[i + 1], array[i + 2], array[i + 3]];
+    vicArrayValues.forEach((value) => this.vicArray.push(cellArray[cellArray.indexOf(value)]));
+    console.log("victoire du joueur :", player, "||  tableau des valeurs gagnantes", this.vicArray);
+  }
+
   lineTest() {
     // Function to test if a line of 4 consecutive pugs is achieved
     const lineArray = cellArray.filter((cell) => cell.line === this.chosenCell.line);
@@ -138,7 +138,10 @@ class gameCl {
 
     for (let i = 0; i <= 3; i++) {
       conditionOfVictory = this.defineCondition(lineArray, i);
-      this.checkCondition(conditionOfVictory, "line");
+      if (conditionOfVictory) {
+        this.fillVictoryArray(lineArray, i);
+        return true;
+      }
     }
   }
 
@@ -149,7 +152,10 @@ class gameCl {
 
     for (let i = 0; i <= 2; i++) {
       conditionOfVictory = this.defineCondition(columnArray, i);
-      this.checkCondition(conditionOfVictory, "column");
+      if (conditionOfVictory) {
+        this.fillVictoryArray(columnArray, i);
+        return true;
+      }
     }
   }
 
@@ -176,7 +182,10 @@ class gameCl {
     if (diagDownArray.length >= 4) {
       for (let i = 0; i < diagDownArray.length - 3; i++) {
         conditionOfVictory = this.defineCondition(diagDownArray, i);
-        this.checkCondition(conditionOfVictory, "diagdown");
+        if (conditionOfVictory) {
+          this.fillVictoryArray(diagDownArray, i);
+          return true;
+        }
       }
     }
   }
@@ -202,24 +211,18 @@ class gameCl {
     if (diagUpArray.length >= 4) {
       for (let i = 0; i < diagUpArray.length - 3; i++) {
         conditionOfVictory = this.defineCondition(diagUpArray, i);
-        this.checkCondition(conditionOfVictory, "diagUp");
+        if (conditionOfVictory) {
+          this.fillVictoryArray(diagUpArray, i);
+          return true;
+        }
       }
     }
   }
 
   testForVictory() {
-    this.countTest();
-
-    this.lineTest();
-
-    this.columnTest();
-
-    this.diagDownTest();
-
-    this.diagUpTest();
-
-    // 4°) Change the player
-    this.chosePlayer();
+    // We test for each possibility to achieve a victory
+    if (this.countTest() || this.lineTest() || this.columnTest() || this.diagDownTest() || this.diagUpTest())
+      return true;
   }
 }
 
@@ -332,8 +335,14 @@ class ControllerCl {
       testBack.updateModel(this.columnChosenByPlayer);
       if (columnIsAlreadyFilled === false) {
         // If the pug is played in a column that is not already full, we can update the graphical representation
-        testBack.testForVictory();
         testFront.updateBoard();
+        if (testBack.testForVictory()) {
+          // Of the conditions for victory are met, we...
+          console.log("annonce victoire dans le controller", "victoire du joueur :", player);
+        } else {
+          // If there is no victory, we change player
+          testBack.chosePlayer();
+        }
       } else {
         // No update of graphic representation
         // We set the variables put in the guard functions back to values that enable the next pug to be played
